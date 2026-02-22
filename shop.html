@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Inventory - Dalia's Kitchen</title>   
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2d2d2d; --accent: #e67e22; --bg: #fcfdb9; --danger: #ff4d4d; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; }
+        .main-content {margin-left: 280px; background: #fcfdb9; padding: 40px; width: calc(100% - 320px);}
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .controls { display: flex; gap: 15px; align-items: center; }
+        .search-box { padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; width: 250px; }
+        .btn-orange { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        /* Category Sections */
+        .cat-section { margin-bottom: 40px; }
+        .cat-heading { font-size: 22px; color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 5px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .shop-card { background: white; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); padding: 15px; text-align: center; border: 1px solid #eee; transition: 0.3s; }
+        .shop-card:hover { transform: translateY(-5px); }
+        .item-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background: #f0f0f0; }
+        .item-name { font-weight: bold; margin-bottom: 12px; display: block; color: #333; }
+        
+        .btn-purchase { background: var(--accent); color: white; width: 100%; border: none; padding: 8px; border-radius: 15px; cursor: pointer; font-size: 11px; margin-bottom: 5px; font-weight: bold; }
+        .btn-delete { background: var(--danger); color: white; width: 100%; border: none; padding: 8px; border-radius: 15px; cursor: pointer; font-size: 11px; font-weight: bold; }
+
+        /* Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; }
+        .modal-content { background: white; width: 380px; margin: 50px auto; padding: 25px; border-radius: 15px; position: relative; }
+        .modal-content label { display: block; margin-top: 10px; font-weight: bold; font-size: 13px; color: #555; }
+        .modal-content input, .modal-content select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .calculation-box { background: #fff4e6; padding: 12px; border-radius: 8px; margin: 15px 0; border: 1px dashed var(--accent); }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="brand"><h2>DALIA'S KITCHEN</h2></div>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="menu.html">Menu</a></li>
+            <li><a href="sale-history.html">Sale History</a></li>
+            <li><a href="sale-report.html">Sale Report</a></li>
+            <li><a href="shop.html" >Shop</a></li>
+            <li><a href="purchase-items.html">Purchase Items</a></li> 
+           <li><a href="lab.html" >Kitchen Lab</a></li>
+
+
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="header-section">
+            <h1>Shop Inventory</h1>
+            <div class="controls">
+                <input type="text" id="shopSearch" class="search-box" placeholder="Search items...">
+                <button class="btn-orange" id="openAddModal">+ Add New Item</button>
+            </div>
+        </div>
+
+        <div id="shopContainer"></div>
+    </div>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0;">Add New Product</h3>
+            <form id="shopForm">
+                <label>Image URL</label>
+                <input type="text" id="prodImg" required>
+                <label>Product Name</label>
+                <input type="text" id="prodName" required>
+                <label>Category</label>
+                <select id="prodCat" required>
+                    <option value="Grain">Grain</option>
+                    <option value="Meats & fish">Meats & fish</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Spices">Spices</option>
+                    <option value="Packages">Packages</option>
+                    <option value="Others">Others</option>
+                </select>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="submit" class="btn-orange" style="flex:1;">Save</button>
+                    <button type="button" onclick="document.getElementById('addModal').style.display='none'" style="flex:1; border:none; background:#eee; border-radius:8px; cursor:pointer;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <h3 id="purTitle" style="color: var(--accent); margin-top:0;">Purchase</h3>
+            <form id="purchaseForm">
+                <input type="hidden" id="purItemName">
+                <label>Date</label>
+                <input type="date" id="purDate" required>
+                <label>Vendor / Shop Name</label>
+                <input type="text" id="purSource" placeholder="e.g. Local Market" required>
+                
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label>Qty</label>
+                        <input type="number" id="purQty" step="any" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Unit</label>
+                        <select id="purUnit">
+                            <option value="kg">kg</option>
+                            <option value="Liter">Liter</option>
+                            <option value="pcs">pcs</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label>Unit Price (৳)</label>
+                <input type="number" id="purPriceUnit" step="any" required>
+
+                <div class="calculation-box">
+                    <p style="margin:0;">Total: <strong id="purTotal">0.00</strong> ৳</p>
+                    <p style="margin:5px 0 0 0;">Due: <strong id="purDue" style="color:red;">0.00</strong> ৳</p>
+                </div>
+
+                <label>Pay Amount (৳)</label>
+                <input type="number" id="purPay" step="any" required>
+
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button type="submit" class="btn-orange" style="flex:1;">Confirm</button>
+                    <button type="button" onclick="document.getElementById('purchaseModal').style.display='none'" style="flex:1; border:none; background:#eee; border-radius:8px; cursor:pointer;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="shop.js"></script>
+</body>
+</html>

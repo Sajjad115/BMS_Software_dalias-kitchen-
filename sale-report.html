@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Report - Dalia's Kitchen</title>
+        <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2d2d2d;
+            --accent: #e67e22;
+            --bg: #f4f7f6;
+            --text: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+        }
+
+       
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            width: calc(100% - 320px);
+        }
+
+        .header-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .search-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        input[type="text"], input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        /* Spreadsheet Style Table */
+        .report-table-container {
+            background: white;
+            padding: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead tr {
+            background: var(--accent);
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #eee;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .download-btn {
+            background: transparent;
+            color: #2980b9;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .download-btn:hover {
+            color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand"><h2>DALIA'S KITCHEN</h2></div>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="menu.html" class="active">Menu</a></li>
+            <li><a href="sale-history.html">Sale History</a></li>
+            <li><a href="sale-report.html">Sale Report</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="purchase-items.html">Purchase Items</a></li>
+            <li><a href="lab.html" >Kitchen Lab</a></li>
+
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <h1>Daily Sale Report</h1>
+
+        <div class="header-box">
+            <div class="search-group">
+                <input type="text" id="reportSearch" placeholder="Search box" style="width: 300px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label>Date</label>
+                    <input type="date" id="startDate">
+                    <span>to</span>
+                    <input type="date" id="endDate">
+                </div>
+            </div>
+        </div>
+
+        <div class="report-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Total Item Sold</th>
+                        <th>Total Cancel</th>
+                        <th>Foodpanda (Revenue)</th>
+                        <th>Foodie (Revenue)</th>
+                        <th>Total Revenue</th>
+                        <th>Total Earning</th>
+                        <th>Daily Report (PDF)</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTbody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="sale-report.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPath = window.location.pathname.split("/").pop();
+            const navLinks = document.querySelectorAll('.sidebar a');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

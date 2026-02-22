@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale History | Dalia's Kitchen</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* PAGE-LEVEL SCROLLING */
+        body { 
+            overflow-x: auto; 
+            display: flex; 
+            min-width: 1700px; 
+            background-color: #f8f9fa;
+        }
+        
+        .content { 
+            flex: 1;
+            margin-left: 260px; 
+            padding: 30px; 
+            width: auto;
+        }
+
+        /* ADVANCED FILTER BAR */
+        .filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end; /* Align inputs properly */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border: 1px solid #edf2f7;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #718096;
+            text-transform: uppercase;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 2px solid #edf2f7;
+            border-radius: 10px;
+            width: 250px;
+            outline: none;
+        }
+
+        .filter-input {
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #edf2f7;
+            outline: none;
+            background: #fff;
+        }
+
+        /* TABLE DESIGN */
+        .history-card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th { background: #f8f9fa; padding: 15px; font-size: 11px; text-transform: uppercase; color: #718096; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+
+        /* STATUS BADGES */
+        .badge { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+        .st-Delivered { background: #c6f6d5; color: #22543d; }
+        .st-Cancelled { background: #fff5f5; color: #c53030; }
+        
+        .plat-tag { background: #ebf8ff; color: #2b6cb0; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+
+        /* ACTIONS */
+        .edit-btn { color: #3182ce; cursor: pointer; margin-right: 15px; }
+        .delete-btn { color: #e53e3e; cursor: pointer; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .modal-content { 
+            background: white; margin: 5% auto; padding: 30px; border-radius: 20px; 
+            width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+        }
+        .modal-content label { display: block; margin-top: 15px; font-size: 12px; color: #4a5568; font-weight: bold; }
+        .modal-content input, .modal-content select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; }
+        
+        .save-btn { 
+            width: 100%; padding: 14px; margin-top: 25px; border-radius: 10px; 
+            background: #e67e22; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="brand"><h2>Dalia's Kitchen</h2></div>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="menu.html">Menu</a></li>
+            <li><a href="sale-history.html" class="active">Sale History</a></li>
+            <li><a href="sale-report.html">Sale Report</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="purchase-items.html">Purchase Items</a></li>
+             <li><a href="lab.html" >Kitchen Lab</a></li>
+
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header>
+            <h1>Earnings History</h1>
+            <p style="color: #a0aec0; margin-bottom: 20px;">Review and manage all customer sales records.</p>
+        </header>
+
+        <section class="filter-section">
+            <div class="filter-group">
+                <label>Search Everything</label>
+                <input type="text" id="masterSearch" class="search-box" placeholder="Order ID, Customer, Item...">
+            </div>
+            
+            <div class="filter-group">
+                <label>From Date</label>
+                <input type="date" id="dateFrom" class="filter-input">
+            </div>
+
+            <div class="filter-group">
+                <label>To Date</label>
+                <input type="date" id="dateTo" class="filter-input">
+            </div>
+
+            <div class="filter-group">
+                <label>Platform</label>
+                <select id="platformFilter" class="filter-input">
+                    <option value="All">All Platforms</option>
+                    <option value="Dine-in">Dine-in</option>
+                    <option value="Foodpanda">Foodpanda</option>
+                    <option value="Foodie">Foodie</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Payment</label>
+                <select id="paymentFilter" class="filter-input">
+                    <option value="All">All Types</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Online">Online</option>
+                </select>
+            </div>
+
+           
+        </section>
+
+        <div class="history-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Order Id</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Price (৳)</th>
+                        <th>Discount (৳)</th>
+                        <th>Platform</th>
+                        <th>Comm & Tax</th>
+                        <th>Total Deduct</th>
+                        <th>Payment</th>
+                        <th>Delivery</th>
+                        <th>Status</th>
+                        <th>Net Earnings</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTbody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 10px;">Edit Order Details</h3>
+            <input type="hidden" id="editDocId">
+            
+            <label>Customer Name</label>
+            <input type="text" id="editCustomer">
+
+            <label>Delivery Status</label>
+            <select id="editDelivery">
+                <option value="Pick Up">Pick Up</option>
+                <option value="Not pick up">Not pick up</option>
+            </select>
+
+            <label>Order Status</label>
+            <select id="editOrder">
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled by customer">Cancelled by customer</option>
+                <option value="Cancelled by us">Cancelled by us</option>
+            </select>
+
+            <button type="button" class="save-btn" id="saveEditBtn">Update Record</button>
+            <button type="button" onclick="document.getElementById('editModal').style.display='none'" style="background:none; border:none; color:#718096; margin-top:15px; cursor:pointer; width:100%; text-align:center;">Discard Changes</button>
+        </div>
+    </div>
+
+    <script type="module" src="sale-history.js"></script>
+</body>
+</html>

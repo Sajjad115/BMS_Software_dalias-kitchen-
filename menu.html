@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Management | Dalia's Kitchen</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2d2d2d; --accent: #e67e22; --bg: #fcfdb9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; }
+        .content { margin-left: 280px; padding: 40px; width: calc(100% - 320px); }
+        .menu-header { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        #menuSearch { width: 400px; padding: 12px 20px; border: 2px solid #edf2f7; border-radius: 12px; outline: none; }
+        
+        /* Category Styles */
+        .cat-section { margin-bottom: 40px; }
+        .cat-heading { font-size: 24px; color: var(--primary); border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 20px; text-transform: uppercase; }
+
+        #cartBar { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(230, 126, 34, 0.15); margin-bottom: 25px; display: none; justify-content: space-between; align-items: center; border-left: 6px solid #e67e22; position: sticky; top: 20px; z-index: 100; }
+        .btn-primary { background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
+        .menu-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f1f1f1; text-align: center; transition: 0.3s; }
+        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .menu-img { width: 100%; height: 160px; object-fit: cover; }
+        .menu-info { padding: 15px; }
+        .price-tag { background: #fff3e0; color: #e67e22; padding: 5px 12px; border-radius: 8px; font-weight: 800; display: inline-block; margin: 10px 0; }
+        
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 20px; width: 420px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: 600; color: #555; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .price-display { background: #fdf2e9; padding: 15px; border-radius: 15px; margin: 15px 0; border: 2px dashed #e67e22; }
+        
+        .qty-btn { background: #e67e22; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+        .cart-item-tag { background: #fff3e0; padding: 8px 12px; border-radius: 10px; border: 1px solid #e67e22; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="brand"><h2>DALIA'S KITCHEN</h2></div>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="menu.html" >Menu</a></li>
+            <li><a href="sale-history.html">Sale History</a></li>
+            <li><a href="sale-report.html">Sale Report</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="purchase-items.html">Purchase Items</a></li>
+            <li><a href="lab.html">Kitchen Lab</a></li>
+
+        </ul>
+    </nav>
+
+    <main class="content">
+        <div class="menu-header">
+            <div>
+                <h1>Kitchen Menu</h1>
+                <p style="color: #666;">Categorized items for easy sales management.</p>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <input type="text" id="menuSearch" placeholder="Search dish...">
+                <button id="openAddModal" class="btn-primary">+ Add New Dish</button>
+            </div>
+        </div>
+
+        <div id="cartBar">
+            <div style="flex-grow: 1;">
+                <h4 style="margin:0;">Current Order (<span id="cartCount">0</span> items)</h4>
+                <div id="cartItemsList" style="margin-top:10px; display: flex; flex-wrap: wrap; gap: 10px;"></div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="clearCart()" style="background:#eee; border:none; padding:10px 15px; border-radius:10px; cursor:pointer;">Clear</button>
+                <button class="btn-primary" onclick="openSaleModal()">Checkout</button>
+            </div>
+        </div>
+
+        <div id="menuSections"></div>
+    </main>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Dish</h3>
+            <form id="menuForm">
+                <div class="form-group"><label>Item Name</label><input type="text" id="itemName" required></div>
+                <div class="form-group"><label>Image URL</label><input type="text" id="imageUrl" placeholder="Paste image link"></div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="itemCategory" required>
+                        <option value="Main Course">Main Course</option>
+                        <option value="Snacks">Snacks</option>
+                        <option value="Beverages">Beverages</option>
+                        <option value="Desserts">Desserts</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Variation</label>
+                    <select id="variation">
+                        <option value="Standard">Standard</option>
+                        <option value="Full">Full</option>
+                        <option value="Half">Half</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Dine-In Price (৳)</label><input type="number" id="basePrice" required></div>
+                
+                <div style="display: flex; gap: 15px; margin-bottom:10px;">
+                    <label><input type="checkbox" id="checkFP"> Foodpanda</label>
+                    <label><input type="checkbox" id="checkFoodie"> Foodie</label>
+                </div>
+                <div class="form-group" id="priceFP" style="display:none;"><input type="number" id="priceFPValue" placeholder="FP Price ৳"></div>
+                <div class="form-group" id="priceFoodie" style="display:none;"><input type="number" id="priceFoodieValue" placeholder="Foodie Price ৳"></div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%;">Save to Menu</button>
+                <button type="button" onclick="document.getElementById('addModal').style.display='none'" style="width: 100%; background:none; border:none; color:gray; cursor:pointer; margin-top:10px;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="saleModal" class="modal">
+        <div class="modal-content">
+            <h3>Finalize Sale</h3>
+            <form id="quickSaleForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group"><label>Date</label><input type="date" id="saleDate" required></div>
+                    <div class="form-group"><label>Order ID</label><input type="text" id="orderId" readonly></div>
+                </div>
+                <div class="form-group"><label>Customer Name</label><input type="text" id="customerName" placeholder="Guest"></div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Platform</label>
+                        <select id="salePlatform">
+                            <option value="Dine-in">Dine-in</option>
+                            <option value="Foodpanda">Foodpanda</option>
+                            <option value="Foodie">Foodie</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment</label>
+                        <select id="paymentType">
+                            <option value="Cash">Cash</option>
+                            <option value="Bkash/Online">Bkash/Online</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Discount (%)</label>
+                    <input type="number" id="saleDiscount" value="0" step="any">
+                </div>
+
+                <div class="price-display">
+                    <div style="display: flex; justify-content: space-between;"><span>Subtotal:</span><span>৳ <span id="displaySubtotal">0</span></span></div>
+                    <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 20px; color: #e67e22; margin-top:10px;">
+                        <span>Final Total:</span><span>৳ <span id="displayTotal">0</span></span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%;">Complete Sale</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="menu.js"></script>
+</body>
+</html>
